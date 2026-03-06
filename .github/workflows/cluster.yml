@@ -44,18 +44,12 @@ jobs:
 
 
       - name: Create model directory
-        run: |
-          mkdir -p models
-
+        run: mkdir -p models
 
       - name: Download model
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          mkdir -p models
-          wget --header="Authorization: Bearer $HF_TOKEN" \
-          -O models/model.gguf \
-          https://huggingface.co/TheBloke/Qwen2.5-Coder-3B-GGUF/resolve/main/qwen2.5-coder-3b.Q4_K_M.gguf
+          wget -O models/model.gguf \
+          https://huggingface.co/Qwen/Qwen2.5-Coder-3B-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q4_k_m.gguf
 
 
       - name: Run worker
