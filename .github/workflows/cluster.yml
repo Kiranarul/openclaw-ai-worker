@@ -2,6 +2,12 @@ name: AI Cluster
 
 on:
   workflow_dispatch:
+    description: "Run AI Cluster Worker"
+    inputs:
+      worker_id:
+        description: "Specific worker ID (optional, runs all if not specified)"
+        required: false
+        default: ""
 
 jobs:
   worker:
