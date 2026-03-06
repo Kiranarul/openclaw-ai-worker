@@ -46,14 +46,19 @@ jobs:
       - name: Create model directory
         run: mkdir -p models
 
+      - name: Install HuggingFace CLI
+        run: pip3 install huggingface_hub
+
       - name: Download model
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        
         run: |
-          wget --header="Authorization: Bearer $HF_TOKEN" \
-          -O models/model.gguf \
-          https://huggingface.co/Qwen/Qwen2.5-Coder-3B-GGUF/resolve/main/qwen2.5-coder-3b-instruct-q4_k_m.gguf
+          mkdir -p models
+          huggingface-cli download \
+            Qwen/Qwen2.5-Coder-3B-GGUF \
+            qwen2.5-coder-3b-instruct-q4_k_m.gguf \
+            --local-dir models \
+            --token $HF_TOKEN
 
 
       - name: Run worker
