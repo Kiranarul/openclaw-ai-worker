@@ -53,18 +53,16 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           mkdir -p models
-          cat > download_model.py << 'PYTHON_SCRIPT'
-from huggingface_hub import hf_hub_download
-import os
-
-hf_hub_download(
-    repo_id="Qwen/Qwen2.5-Coder-3B-GGUF",
-    filename="qwen2.5-coder-3b-instruct-q4_k_m.gguf",
-    token=os.environ["HF_TOKEN"],
-    local_dir="models",
-    local_dir_use_symlinks=False
-)
-PYTHON_SCRIPT
+          echo "from huggingface_hub import hf_hub_download" > download_model.py
+          echo "import os" >> download_model.py
+          echo "" >> download_model.py
+          echo "hf_hub_download(" >> download_model.py
+          echo "    repo_id=\"Qwen/Qwen2.5-Coder-3B-GGUF\"," >> download_model.py
+          echo "    filename=\"qwen2.5-coder-3b-instruct-q4_k_m.gguf\"," >> download_model.py
+          echo "    token=os.environ[\"HF_TOKEN\"]," >> download_model.py
+          echo "    local_dir=\"models\"," >> download_model.py
+          echo "    local_dir_use_symlinks=False" >> download_model.py
+          echo ")" >> download_model.py
           python3 download_model.py
 
 
