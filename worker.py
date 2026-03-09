@@ -111,6 +111,13 @@ while True:
 
         print(f"Generating response for prompt: {prompt[:100]}...")
 
+        # Ensure prompt is properly formatted as a string
+        if not isinstance(prompt, str):
+            result = f"ERROR: Invalid prompt type - {type(prompt)}"
+            print(result)
+            submit_result(task_id, result)
+            continue
+
         messages = [
             {
                 "role": "user",
