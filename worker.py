@@ -17,10 +17,16 @@ MODEL_ID = "Qwen/Qwen3.5-2B"
 
 print("Loading model...")
 
-processor = AutoProcessor.from_pretrained(MODEL_ID)
+HF_TOKEN = os.environ.get("HF_TOKEN")
+
+processor = AutoProcessor.from_pretrained(
+    MODEL_ID,
+    token=HF_TOKEN
+)
 
 model = AutoModelForImageTextToText.from_pretrained(
     MODEL_ID,
+    token=HF_TOKEN,
     torch_dtype=torch.float32,
     device_map="cpu"
 )
