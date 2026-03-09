@@ -101,6 +101,11 @@ while True:
 
     print(f"Task data type - id: {type(task_id)}, prompt: {type(prompt)}")
     print(f"Prompt value: {prompt}")
+    
+    # Safety check: ensure prompt is a string
+    if not isinstance(prompt, str):
+        print(f"WARNING: Prompt is not a string! Type: {type(prompt)}, Value: {prompt}")
+        prompt = str(prompt)
 
     try:
 
