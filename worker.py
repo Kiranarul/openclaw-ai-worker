@@ -36,8 +36,12 @@ print("Model ready")
 
 def get_task():
     try:
-        url = f"{SUPABASE_URL}/rest/v1/tasks?status=eq.pending&limit=1"
-        r = requests.get(url, headers=HEADERS)
+
+        r = requests.post(
+            f"{SUPABASE_URL}/rest/v1/rpc/claim_task",
+            headers=HEADERS
+        )
+
         data = r.json()
 
         if len(data) == 0:
@@ -83,8 +87,6 @@ while True:
     prompt = task["prompt"]
 
     print("Processing task:", task_id)
-
-    mark_running(task_id)
 
     try:
 
