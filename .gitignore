@@ -44,5 +44,5 @@ ENV/
 Thumbs.db
 
 # Project specific
-gateway.py
+# gateway.py - temporarily removed for deployment
 UsersKiran*/
