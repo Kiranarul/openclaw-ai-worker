@@ -2,7 +2,7 @@ import requests
 import time
 import os
 import torch
-from transformers import AutoProcessor, AutoModelForImageTextToText
+from transformers import AutoProcessor, AutoModelForCausalLM
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
@@ -24,11 +24,12 @@ processor = AutoProcessor.from_pretrained(
     token=HF_TOKEN
 )
 
-model = AutoModelForImageTextToText.from_pretrained(
+model = AutoModelForCausalLM.from_pretrained(
     MODEL_ID,
     token=HF_TOKEN,
-    torch_dtype=torch.float32,
-    device_map="cpu"
+    torch_dtype=torch.float16,
+    device_map="auto",
+    trust_remote_code=True
 )
 
 print("Model ready")
@@ -90,12 +91,12 @@ while True:
 
     try:
 
+        print(f"Generating response for prompt: {prompt[:100]}...")
+
         messages = [
             {
                 "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt}
-                ]
+                "content": prompt
             }
         ]
 
@@ -107,14 +108,24 @@ while True:
             return_tensors="pt"
         )
 
+        print(f"Input shape: {inputs['input_ids'].shape}")
+
         outputs = model.generate(**inputs, max_new_tokens=200)
 
+        print(f"Output shape: {outputs.shape}")
+
         result = processor.decode(
-            outputs[0][inputs["input_ids"].shape[-1]:]
+            outputs[0][inputs["input_ids"].shape[-1]:],
+            skip_special_tokens=True
         )
 
+        print(f"Generated result: {result[:200]}")
+
     except Exception as e:
+        import traceback
         result = f"Execution error: {str(e)}"
+        print("ERROR:", result)
+        traceback.print_exc()
 
     submit_result(task_id, result)
 
