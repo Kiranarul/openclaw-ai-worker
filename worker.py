@@ -88,6 +88,14 @@ while True:
         time.sleep(5)
         continue
 
+    print(f"Full task object: {task}")
+    print(f"Task type: {type(task)}")
+
+    # Safety check: ensure task is a dict
+    if not isinstance(task, dict):
+        print(f"ERROR: Task is not a dictionary! Got: {type(task)}")
+        continue
+
     task_id = task["id"]
     prompt = task["prompt"]
 
