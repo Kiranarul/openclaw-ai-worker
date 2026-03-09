@@ -43,7 +43,9 @@ def get_task():
             headers=HEADERS
         )
 
+        print(f"Claim task response: {r.status_code}")
         data = r.json()
+        print(f"Claim task data: {data}")
 
         if len(data) == 0:
             return None
@@ -52,6 +54,8 @@ def get_task():
 
     except Exception as e:
         print("Error fetching task:", e)
+        import traceback
+        traceback.print_exc()
         return None
 
 
@@ -87,7 +91,8 @@ while True:
     task_id = task["id"]
     prompt = task["prompt"]
 
-    print("Processing task:", task_id)
+    print(f"Task data type - id: {type(task_id)}, prompt: {type(prompt)}")
+    print(f"Prompt value: {prompt}")
 
     try:
 
