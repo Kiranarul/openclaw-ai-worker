@@ -1,7 +1,8 @@
 import requests
-import subprocess
 import time
 import os
+import torch
+from transformers import AutoProcessor, AutoModelForImageTextToText
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
@@ -12,8 +13,19 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-MODEL_PATH = "models/model.gguf"
-LLAMA_PATH = "./llama.cpp/build/bin/llama-cli"
+MODEL_ID = "Qwen/Qwen3.5-2B"
+
+print("Loading model...")
+
+processor = AutoProcessor.from_pretrained(MODEL_ID)
+
+model = AutoModelForImageTextToText.from_pretrained(
+    MODEL_ID,
+    torch_dtype=torch.float32,
+    device_map="cpu"
+)
+
+print("Model ready")
 
 
 def get_task():
@@ -39,6 +51,7 @@ def mark_running(task_id):
 
 def submit_result(task_id, result):
     url = f"{SUPABASE_URL}/rest/v1/tasks?id=eq.{task_id}"
+
     requests.patch(
         url,
         headers=HEADERS,
@@ -68,22 +81,33 @@ while True:
     mark_running(task_id)
 
     try:
-        result = subprocess.run(
-            [
-                LLAMA_PATH,
-                "-m", MODEL_PATH,
-                "-p", prompt,
-                "-n", "512"
-            ],
-            capture_output=True,
-            text=True
+
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt}
+                ]
+            }
+        ]
+
+        inputs = processor.apply_chat_template(
+            messages,
+            add_generation_prompt=True,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt"
         )
 
-        output = result.stdout
+        outputs = model.generate(**inputs, max_new_tokens=200)
+
+        result = processor.decode(
+            outputs[0][inputs["input_ids"].shape[-1]:]
+        )
 
     except Exception as e:
-        output = f"Execution error: {str(e)}"
+        result = f"Execution error: {str(e)}"
 
-    submit_result(task_id, output)
+    submit_result(task_id, result)
 
     print("Task completed:", task_id)

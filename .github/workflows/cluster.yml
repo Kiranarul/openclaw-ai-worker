@@ -2,10 +2,9 @@ name: AI Cluster
 
 on:
   workflow_dispatch:
-    description: "Run AI Cluster Worker"
     inputs:
       worker_id:
-        description: "Specific worker ID (optional, runs all if not specified)"
+        description: "Specific worker ID (optional)"
         required: false
         default: ""
 
@@ -29,42 +28,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential cmake python3 python3-pip git wget
-          pip3 install requests huggingface_hub
-
-
-      - name: Clone llama.cpp
-        run: git clone https://github.com/ggerganov/llama.cpp
-
-
-      - name: Build llama.cpp
-        run: |
-          cd llama.cpp
-          cmake -B build
-          cmake --build build --config Release -j
-
-
-      - name: Download model
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          mkdir -p models
-          echo "from huggingface_hub import hf_hub_download" > download_model.py
-          echo "import os" >> download_model.py
-          echo "" >> download_model.py
-          echo "hf_hub_download(" >> download_model.py
-          echo "    repo_id=\"Qwen/Qwen3.5-2B\"," >> download_model.py
-          echo "    filename=\"qwen3.5-2b-instruct-q4_k_m.gguf\"," >> download_model.py
-          echo "    token=os.environ[\"HF_TOKEN\"]," >> download_model.py
-          echo "    local_dir=\"models\"," >> download_model.py
-          echo "    local_dir_use_symlinks=False" >> download_model.py
-          echo ")" >> download_model.py
-          python3 download_model.py
-
+          sudo apt install -y python3 python3-pip
+          pip3 install torch transformers accelerate pillow requests
 
       - name: Run worker
         env:
